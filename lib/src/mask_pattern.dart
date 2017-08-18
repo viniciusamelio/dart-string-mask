@@ -10,14 +10,14 @@ class MaskPattern {
       this.default_,
       this.optional,
       this.transform,
-      this.recursive,
-      this.escape});
+      this.recursive = false,
+      this.escape = false});
 }
 
 class MaskOptions {
   bool reverse = false;
   bool usedefaults = false;
-  MaskOptions({this.reverse});
+  MaskOptions({this.reverse = false, this.usedefaults = false});
 }
 
 class MaskProcess {
