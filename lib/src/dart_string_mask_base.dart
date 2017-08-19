@@ -8,7 +8,7 @@ class StringMask {
   MaskOptions options;
 
   Map<String, MaskPattern> tokens = {
-    '0': new MaskPattern(pattern: "/\d/", default_: "_default"),
+    '0': new MaskPattern(pattern: "/\d/", default_: "0"),
     '9': new MaskPattern(pattern: "/\d/", optional: true),
     '#': new MaskPattern(pattern: "/\d/", optional: true, recursive: true),
     'A': new MaskPattern(pattern: "/[a-zA-Z0-9]/}"),
@@ -119,7 +119,7 @@ class StringMask {
 
     bool continueCondition(MaskOptions options) {
       if (!inRecursiveMode &&
-          recursive.length > 0 &&
+          recursive.length == 0 &&
           hasMoreTokens(pattern2, patternPos, steps.inc)) {
         // continue in the normal iteration
         return true;
