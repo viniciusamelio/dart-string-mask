@@ -112,34 +112,34 @@ var result = StringMask.process_('some value string', 'some mask', optionsObject
 #### Brazilian CPF number
 
 ```dart
-	var formatter = new StringMask('000.000.000-00');
-	var result = formatter.apply('12965815620'); // 129.658.156-20
+    var formatter = new StringMask('000.000.000-00');
+    var result = formatter.apply('12965815620'); // 129.658.156-20
 ```
 
 #### Date and time
 
 ```dart
-	var formatter = new StringMask('90/90/9900');
-	var result = formatter.apply('1187'); // 1/1/87
+    var formatter = new StringMask('90/90/9900');
+    var result = formatter.apply('1187'); // 1/1/87
 ```
 
 #### Convert Case
 
 ```dart
-	var formatter = new StringMask('UUUUUUUUUUUUU');
-	var result = formatter.apply('To Upper Case'); // TO UPPER CASE
+    var formatter = new StringMask('UUUUUUUUUUUUU');
+    var result = formatter.apply('To Upper Case'); // TO UPPER CASE
 ```
 
 ```dart
-	var formatter = new StringMask('LLLLLLLLLLLLL');
-	var result = formatter.apply('To Lower Case'); // to lower case
+    var formatter = new StringMask('LLLLLLLLLLLLL');
+    var result = formatter.apply('To Lower Case'); // to lower case
 ```
 
 #### International Bank Number
 
 ```Dart
-	var formatter = new StringMask('UUAA AAAA AAAA AAAA AAAA AAAA AAA');
-	var result = formatter.apply('FR761111BBBB69410000AA33222');
+    var formatter = new StringMask('UUAA AAAA AAAA AAAA AAAA AAAA AAA');
+    var result = formatter.apply('FR761111BBBB69410000AA33222');
 	// result: FR76 1111 BBBB 6941 0000 AA33 222
 ```
 
