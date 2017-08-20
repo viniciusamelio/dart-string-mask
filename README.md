@@ -14,8 +14,8 @@ A string formatter and validator based on masks.
 **With pub.dartlang.org!**
 
 ```yaml
-#dependencies:
-#  string_mask: ^0.0.1
+dependencies:
+  string_mask: "^0.0.1"
 ```
 
 ## SPECIAL MASK CHARACTERS
