@@ -1,7 +1,7 @@
 // Copyright (c) 2017, EmersonMoura. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-import 'package:dart_string_mask/src/mask_pattern.dart';
+import 'package:string_mask/src/mask_pattern.dart';
 
 class StringMask {
   String pattern;
@@ -11,15 +11,15 @@ class StringMask {
     '0': new MaskPattern(pattern: "\\d", default_: "0"),
     '9': new MaskPattern(pattern: "\\d", optional: true),
     '#': new MaskPattern(pattern: "\\d", optional: true, recursive: true),
-    'A': new MaskPattern(pattern: "[a-zA-Z0-9]"),
-    'S': new MaskPattern(pattern: "[a-zA-Z]"),
+    'A': new MaskPattern(pattern: "[a-zA-Z0-9 ]"),
+    'S': new MaskPattern(pattern: "[a-zA-Z ]"),
     'U': new MaskPattern(
-        pattern: "[a-zA-Z]",
+        pattern: "[a-zA-Z ]",
         transform: (String c) {
           return c.toUpperCase();
         }),
     'L': new MaskPattern(
-        pattern: "[a-zA-Z]",
+        pattern: "[a-zA-Z ]",
         transform: (String c) {
           return c.toLowerCase();
         }),
@@ -255,7 +255,7 @@ class StringMask {
         // if token is optional, only add the value char if it matchs the token pattern
         // if not, move on to the next pattern char
 
-        if (new RegExp(token.pattern).hasMatch(vc) &&
+        if (vc != null && new RegExp(token.pattern).hasMatch(vc) &&
             optionalNumbersToUse > 0) {
           formatted = concatChar(formatted, vc, this.options, token);
           valuePos = valuePos + steps.inc;
@@ -294,16 +294,16 @@ class StringMask {
         .process(value)
         .valid;
   }
-}
 
-MaskProcess process(value, pattern, options) {
-  return new StringMask(pattern, options: options).process(value);
-}
+  static MaskProcess process_(value, pattern, options) {
+    return new StringMask(pattern, options: options).process(value);
+  }
 
-String apply(value, pattern, options) {
-  return new StringMask(pattern, options: options).apply(value);
-}
+  static String apply_(value, pattern, options) {
+    return new StringMask(pattern, options: options).apply(value);
+  }
 
-bool validate(value, pattern, options) {
-  return new StringMask(pattern, options: options).validate(value);
+  static bool validate_(value, pattern, options) {
+    return new StringMask(pattern, options: options).validate(value);
+  }
 }

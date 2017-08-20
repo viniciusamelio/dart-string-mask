@@ -1,8 +1,8 @@
 // Copyright (c) 2017, EmersonMoura. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-import 'package:dart_string_mask/dart_string_mask.dart';
-import 'package:dart_string_mask/src/mask_pattern.dart';
+import 'package:string_mask/src/mask_pattern.dart';
+import 'package:string_mask/string_mask.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -10,16 +10,18 @@ void main() {
     setUp(() {});
 
     test('Number', () {
-      var dartStringMask = new StringMask("#0");
-      expect(dartStringMask.apply("123"), "123");
+      var maskOptions = new MaskOptions()
+        ..reverse = true;
+
+      var dartStringMask = new StringMask("#0", options: maskOptions);
+      expect(dartStringMask.apply("12345"), "12345");
     });
 
     test('Two decimal number with thousands separators', () {
       var maskOptions = new MaskOptions()
         ..reverse = true;
 
-      var formatter =
-      new StringMask('#.##0,00', options: maskOptions);
+      var formatter = new StringMask('#.##0,00', options: maskOptions);
       var result = formatter.apply('100123456'); // 1.001.234,56
       expect(result, "1.001.234,56");
     });
@@ -31,7 +33,10 @@ void main() {
     });
 
     test('Percentage', () {
-      var formatter = new StringMask('#0,00%');
+      var maskOptions = new MaskOptions()
+        ..reverse = true;
+
+      var formatter = new StringMask('#0,00%', options: maskOptions);
       var result = formatter.apply('001'); // 0,01%
       expect(result, "0,01%");
     });
@@ -59,6 +64,5 @@ void main() {
       var result = formatter.apply('FR761111BBBB69410000AA33222');
       expect(result, "FR76 1111 BBBB 6941 0000 AA33 222");
     });
-
   });
 }
