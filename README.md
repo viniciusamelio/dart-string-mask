@@ -157,7 +157,8 @@ We'd love for you to contribute to our source code! We just ask to:
 
 ## LICENSE
 
-Copyright (c) 2016 Daniel Campos
+Copyright (c) 2016 Daniel Campos (JS Project)
+Copyright (c) 2017 Emerson Moura (DartProject)
 
 Licensed under the MIT license.
   
