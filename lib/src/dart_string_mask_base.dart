@@ -8,27 +8,35 @@ class StringMask {
   MaskOptions options;
 
   Map<String, MaskPattern> tokens = {
-    '0': new MaskPattern(pattern: "/\d/", default_: "0"),
-    '9': new MaskPattern(pattern: "/\d/", optional: true),
-    '#': new MaskPattern(pattern: "/\d/", optional: true, recursive: true),
-    'A': new MaskPattern(pattern: "/[a-zA-Z0-9]/}"),
-    'S': new MaskPattern(pattern: "/[a-zA-Z]/}"),
+    '0': new MaskPattern(pattern: "\\d", default_: "0"),
+    '9': new MaskPattern(pattern: "\\d", optional: true),
+    '#': new MaskPattern(pattern: "\\d", optional: true, recursive: true),
+    'A': new MaskPattern(pattern: "[a-zA-Z0-9]"),
+    'S': new MaskPattern(pattern: "[a-zA-Z]"),
     'U': new MaskPattern(
-        pattern: "/[a-zA-Z]/}",
+        pattern: "[a-zA-Z]",
         transform: (String c) {
           return c.toUpperCase();
         }),
     'L': new MaskPattern(
-        pattern: "/[a-zA-Z]/}",
+        pattern: "[a-zA-Z]",
         transform: (String c) {
           return c.toLowerCase();
         }),
     '\$': new MaskPattern(escape: true)
   };
 
-  StringMask({this.pattern, this.options}) {
+  StringMask(this.pattern, {this.options}) {
     if (options == null) {
       this.options = new MaskOptions();
+    }
+
+    if (this.options.reverse == null) {
+      this.options.reverse = false;
+    }
+
+    if (this.options.usedefaults == null) {
+      this.options.usedefaults = this.options.reverse;
     }
 
     this.pattern = pattern;
@@ -40,21 +48,26 @@ class StringMask {
     MaskPattern token = new MaskPattern(escape: true);
 
     while (i >= 0 && token != null && token.escape) {
-      token = tokens[pattern[i]];
-      count += token.escape ? 1 : 0;
+      var key = pattern[i];
+      token = tokens[key];
+      count += (token != null && token.escape) ? 1 : 0;
       i--;
     }
     return count > 0 && count % 2 == 1;
   }
 
   int calcOptionalNumbersToUse(String pattern, String value) {
-    int numbersInP = pattern.replaceAll("/[^0]/g", '').length;
-    int numbersInV = value.replaceAll("/[^\d]/g", '').length;
+    int numbersInP = pattern
+        .replaceAll(new RegExp("[^0]"), '')
+        .length;
+    int numbersInV = value
+        .replaceAll(new RegExp("[^\\d]"), '')
+        .length;
     return numbersInV - numbersInP;
   }
 
-  String concatChar(
-      String text, String character, MaskOptions options, MaskPattern token) {
+  String concatChar(String text, String character, MaskOptions options,
+      MaskPattern token) {
     if (token != null && token.transform != null) {
       character = token.transform(character);
     }
@@ -65,10 +78,15 @@ class StringMask {
   }
 
   bool hasMoreTokens(String pattern, int pos, int inc) {
-    String pc = pattern[pos];
+    String pc;
+
+    if (pattern.length > pos && pos >= 0) {
+      pc = pattern[pos];
+    }
+
     MaskPattern token = tokens[pc];
 
-    if (pc == '') {
+    if (pc == null) {
       return false;
     }
 
@@ -78,20 +96,29 @@ class StringMask {
   }
 
   bool hasMoreRecursiveTokens(String pattern, int pos, int inc) {
-    String pc = pattern[pos];
+    String pc;
+
+    if (pattern.length > pos && pos >= 0) {
+      pc = pattern[pos];
+    }
+
     MaskPattern token = tokens[pc];
 
-    if (pc == '') {
+    if (pc == null) {
       return false;
     }
+
     return token != null && token.recursive
         ? true
         : hasMoreRecursiveTokens(pattern, pos + inc, inc);
   }
 
   String insertChar(String text, String char, int position) {
-    List<String> t = text.split('');
+    List<String> t = new List();
+    t.addAll(text.split(''));
+
     t.insert(position, char);
+
     return t.join('');
   }
 
@@ -157,12 +184,20 @@ class StringMask {
      * Note: The iteration must stop if an invalid char is found.
      */
     for (patternPos = steps.start;
-        continueCondition(this.options);
-        patternPos = patternPos + steps.inc) {
+    continueCondition(this.options);
+    patternPos = patternPos + steps.inc) {
       // Value char
-      String vc = value[valuePos];
+      String vc;
+
+      if (value.length > valuePos && valuePos >= 0) {
+        vc = value[valuePos];
+      }
       // Pattern char to match with the value char
-      String pc = pattern2[patternPos];
+      String pc;
+
+      if (pattern2.length > patternPos && patternPos >= 0) {
+        pc = pattern2[patternPos];
+      }
 
       MaskPattern token = tokens[pc];
 
@@ -209,9 +244,7 @@ class StringMask {
 
       // 3. Handle the value
       // break iterations: if value is invalid for the given pattern
-      RegExp regExp = new RegExp(token.pattern);
-
-      if (token != null) {
+      if (token == null) {
         // add char of the pattern
         formatted = concatChar(formatted, pc, this.options, token);
         if (!inRecursiveMode && recursive.length > 0) {
@@ -221,7 +254,9 @@ class StringMask {
       } else if (token.optional) {
         // if token is optional, only add the value char if it matchs the token pattern
         // if not, move on to the next pattern char
-        if (regExp.hasMatch(vc) && optionalNumbersToUse > 0) {
+
+        if (new RegExp(token.pattern).hasMatch(vc) &&
+            optionalNumbersToUse > 0) {
           formatted = concatChar(formatted, vc, this.options, token);
           valuePos = valuePos + steps.inc;
           optionalNumbersToUse--;
@@ -229,7 +264,7 @@ class StringMask {
           valid = false;
           break;
         }
-      } else if (regExp.hasMatch(vc)) {
+      } else if (new RegExp(token.pattern).hasMatch(vc)) {
         // if token isn't optional the value char must match the token pattern
         formatted = concatChar(formatted, vc, this.options, token);
         valuePos = valuePos + steps.inc;
@@ -249,22 +284,26 @@ class StringMask {
   }
 
   String apply(value) {
-    return this.process(value).result;
+    return this
+        .process(value)
+        .result;
   }
 
   bool validate(value) {
-    return this.process(value).valid;
+    return this
+        .process(value)
+        .valid;
   }
 }
 
 MaskProcess process(value, pattern, options) {
-  return new StringMask(pattern: pattern, options: options).process(value);
+  return new StringMask(pattern, options: options).process(value);
 }
 
 String apply(value, pattern, options) {
-  return new StringMask(pattern: pattern, options: options).apply(value);
+  return new StringMask(pattern, options: options).apply(value);
 }
 
 bool validate(value, pattern, options) {
-  return new StringMask(pattern: pattern, options: options).validate(value);
+  return new StringMask(pattern, options: options).validate(value);
 }

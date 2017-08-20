@@ -8,7 +8,7 @@ class MaskPattern {
 
   MaskPattern({this.pattern,
     this.default_,
-    this.optional,
+    this.optional = false,
     this.transform,
     this.recursive = false,
     this.escape = false});
@@ -18,11 +18,7 @@ class MaskOptions {
   bool reverse = false;
   bool usedefaults = false;
 
-  MaskOptions({this.reverse = false, this.usedefaults}) {
-    if (this.usedefaults == null) {
-      this.usedefaults = this.reverse;
-    }
-  }
+  MaskOptions({this.reverse, this.usedefaults});
 }
 
 class MaskProcess {

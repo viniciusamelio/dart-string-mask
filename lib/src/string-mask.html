@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="string-mask.js"></script>
+
+<script>
+    var formatter = new StringMask("#0");
+    var result = formatter.apply('123'); // 1.001.234,56
+
+    console.log(result);
+</script>
+</body>
+</html>
