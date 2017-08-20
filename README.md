@@ -87,16 +87,16 @@ var result = StringMask.process_('some value string', 'some mask', optionsObject
     var maskOptions = new MaskOptions()
       ..reverse = true;
 
-	var formatter = new StringMask('#.##0,00', options: maskOptions);
-	var result = formatter.apply('100123456'); // 1.001.234,56
-	var result2 = formatter.apply('6'); // 0,06
+    var formatter = new StringMask('#.##0,00', options: maskOptions);
+    var result = formatter.apply('100123456'); // 1.001.234,56
+    var result2 = formatter.apply('6'); // 0,06
 ```
 
 #### Phone number
 
 ```dart
-	var formatter = new StringMask('+00 (00) 0000-0000');
-	var result = formatter.apply('553122222222'); // +55 (31) 2222-2222
+    var formatter = new StringMask('+00 (00) 0000-0000');
+    var result = formatter.apply('553122222222'); // +55 (31) 2222-2222
 ```
 
 #### Percentage
