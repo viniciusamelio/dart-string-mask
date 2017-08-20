@@ -78,7 +78,7 @@ var result = StringMask.process_('some value string', 'some mask', optionsObject
       ..reverse = true;
 
     var formatter = new StringMask("#0", options: maskOptions);
-	var result = formatter.apply('123'); // 123
+    var result = formatter.apply('123'); // 123
 ```
 
 #### Two decimal number with thousands separators
@@ -106,7 +106,7 @@ var result = StringMask.process_('some value string', 'some mask', optionsObject
       ..reverse = true;
 
     var formatter = new StringMask('#.##0,00', options: maskOptions);
-	var result = formatter.apply('001'); // 0,01%
+    var result = formatter.apply('001'); // 0,01%
 ```
 
 #### Brazilian CPF number
