@@ -5,7 +5,7 @@ import 'package:string_mask/src/mask_pattern.dart';
 
 class StringMask {
   String pattern;
-  MaskOptions options;
+  MaskOptions? options;
 
   Map<String, MaskPattern> tokens = {
     '0': new MaskPattern(pattern: "\\d", default_: "0"),
@@ -31,12 +31,12 @@ class StringMask {
       this.options = new MaskOptions();
     }
 
-    if (this.options.reverse == null) {
-      this.options.reverse = false;
+    if (this.options?.reverse == null) {
+      this.options?.reverse = false;
     }
 
-    if (this.options.usedefaults == null) {
-      this.options.usedefaults = this.options.reverse;
+    if (this.options?.usedefaults == null) {
+      this.options?.usedefaults = this.options?.reverse;
     }
 
     this.pattern = pattern;
@@ -45,7 +45,7 @@ class StringMask {
   bool isEscaped(String pattern, int pos) {
     int count = 0;
     int i = pos - 1;
-    MaskPattern token = new MaskPattern(escape: true);
+    MaskPattern? token = new MaskPattern(escape: true);
 
     while (i >= 0 && token != null && token.escape) {
       var key = pattern[i];
@@ -66,25 +66,25 @@ class StringMask {
     return numbersInV - numbersInP;
   }
 
-  String concatChar(String text, String character, MaskOptions options,
-      MaskPattern token) {
+  String concatChar(String text, String character, MaskOptions? options,
+      MaskPattern? token) {
     if (token != null && token.transform != null) {
-      character = token.transform(character);
+      character = token.transform?.call(character);
     }
-    if (options.reverse) {
+    if (options?.reverse == true) {
       return character + text;
     }
     return text + character;
   }
 
   bool hasMoreTokens(String pattern, int pos, int inc) {
-    String pc;
+    String? pc;
 
     if (pattern.length > pos && pos >= 0) {
       pc = pattern[pos];
     }
 
-    MaskPattern token = tokens[pc];
+    MaskPattern? token = tokens[pc];
 
     if (pc == null) {
       return false;
@@ -96,13 +96,13 @@ class StringMask {
   }
 
   bool hasMoreRecursiveTokens(String pattern, int pos, int inc) {
-    String pc;
+    String? pc;
 
     if (pattern.length > pos && pos >= 0) {
       pc = pattern[pos];
     }
 
-    MaskPattern token = tokens[pc];
+    MaskPattern? token = tokens[pc];
 
     if (pc == null) {
       return false;
@@ -114,7 +114,7 @@ class StringMask {
   }
 
   String insertChar(String text, String char, int position) {
-    List<String> t = new List();
+    List<String> t = [];
     t.addAll(text.split(''));
 
     t.insert(position, char);
@@ -122,7 +122,7 @@ class StringMask {
     return t.join('');
   }
 
-  MaskProcess process(String value) {
+  MaskProcess process(String? value) {
     if (value == null) {
       return new MaskProcess(result: '', valid: false);
     }
@@ -132,19 +132,19 @@ class StringMask {
     String pattern2 = this.pattern;
     bool valid = true;
     String formatted = '';
-    int valuePos = this.options.reverse ? value.length - 1 : 0;
+    int valuePos = this.options?.reverse == true ? value.length - 1 : 0;
     int patternPos = 0;
     int optionalNumbersToUse = calcOptionalNumbersToUse(pattern2, value);
     bool escapeNext = false;
-    List<String> recursive = new List();
+    List<String> recursive = [];
     bool inRecursiveMode = false;
 
     MaskStep steps = new MaskStep()
-      ..start = this.options.reverse ? pattern2.length - 1 : 0
-      ..end = this.options.reverse ? -1 : pattern2.length
-      ..inc = this.options.reverse ? -1 : 1;
+      ..start = this.options?.reverse == true ? pattern2.length - 1 : 0
+      ..end = this.options?.reverse == true ? -1 : pattern2.length
+      ..inc = this.options?.reverse == true ? -1 : 1;
 
-    bool continueCondition(MaskOptions options) {
+    bool continueCondition(MaskOptions? options) {
       if (!inRecursiveMode &&
           recursive.length == 0 &&
           hasMoreTokens(pattern2, patternPos, steps.inc)) {
@@ -164,11 +164,11 @@ class StringMask {
       if (inRecursiveMode) {
         String pc = recursive.removeAt(0);
         recursive.add(pc);
-        if (options.reverse && valuePos >= 0) {
+        if (options?.reverse == true && valuePos >= 0) {
           patternPos++;
           pattern2 = insertChar(pattern2, pc, patternPos);
           return true;
-        } else if (!options.reverse && valuePos < value.length) {
+        } else if (!(options?.reverse == true) && value != null && valuePos < value.length) {
           pattern2 = insertChar(pattern2, pc, patternPos);
           return true;
         }
@@ -187,19 +187,19 @@ class StringMask {
     continueCondition(this.options);
     patternPos = patternPos + steps.inc) {
       // Value char
-      String vc;
+      String? vc;
 
       if (value.length > valuePos && valuePos >= 0) {
         vc = value[valuePos];
       }
       // Pattern char to match with the value char
-      String pc;
+      String? pc;
 
       if (pattern2.length > patternPos && patternPos >= 0) {
         pc = pattern2[patternPos];
       }
 
-      MaskPattern token = tokens[pc];
+      MaskPattern? token = tokens[pc];
 
       if (recursive.length > 0 && token != null && !token.recursive) {
         // In the recursive portion of the pattern: tokens not recursive must be seen as static chars
@@ -209,18 +209,18 @@ class StringMask {
       // 1. Handle escape tokens in pattern
       // go to next iteration: if the pattern char is a escape char or was escaped
       if (!inRecursiveMode || vc != null) {
-        if (this.options.reverse && isEscaped(pattern2, patternPos)) {
+        if (this.options?.reverse == true && isEscaped(pattern2, patternPos) && pc != null) {
           // pattern char is escaped, just add it and move on
           formatted = concatChar(formatted, pc, this.options, token);
           // skip escape token
           patternPos = patternPos + steps.inc;
           continue;
-        } else if (!this.options.reverse && escapeNext) {
+        } else if (this.options?.reverse == false && escapeNext && pc != null) {
           // pattern char is escaped, just add it and move on
           formatted = concatChar(formatted, pc, this.options, token);
           escapeNext = false;
           continue;
-        } else if (!this.options.reverse && token != null && token.escape) {
+        } else if (this.options?.reverse == true && token != null && token.escape) {
           // mark to escape the next pattern char
           escapeNext = true;
           continue;
@@ -230,10 +230,10 @@ class StringMask {
       // 2. Handle recursive tokens in pattern
       // go to next iteration: if the value str is finished or
       //                       if there is a normal token in the recursive portion of the pattern
-      if (!inRecursiveMode && token != null && token.recursive) {
+      if (!inRecursiveMode && token != null && token.recursive && pc != null) {
         // save it to repeat in the end of the pattern and handle the value char now
         recursive.add(pc);
-      } else if (inRecursiveMode && vc == null) {
+      } else if (inRecursiveMode && vc == null && pc != null) {
         // in recursive mode but value is finished. Add the pattern char if it is not a recursive token
         formatted = concatChar(formatted, pc, this.options, token);
         continue;
@@ -242,20 +242,23 @@ class StringMask {
         continue;
       }
 
+      final pattern = token?.pattern;
+      final tokenDefault = token?.default_;
+
       // 3. Handle the value
       // break iterations: if value is invalid for the given pattern
-      if (token == null) {
+      if (token == null && pc != null) {
         // add char of the pattern
         formatted = concatChar(formatted, pc, this.options, token);
         if (!inRecursiveMode && recursive.length > 0) {
           // save it to repeat in the end of the pattern
           recursive.add(pc);
         }
-      } else if (token.optional) {
+      } else if (token?.optional == true) {
         // if token is optional, only add the value char if it matchs the token pattern
         // if not, move on to the next pattern char
 
-        if (vc != null && new RegExp(token.pattern).hasMatch(vc) &&
+        if (vc != null && pattern != null && new RegExp(pattern).hasMatch(vc) &&
             optionalNumbersToUse > 0) {
           formatted = concatChar(formatted, vc, this.options, token);
           valuePos = valuePos + steps.inc;
@@ -264,15 +267,16 @@ class StringMask {
           valid = false;
           break;
         }
-      } else if (new RegExp(token.pattern).hasMatch(vc)) {
+      } else if (vc != null && pattern != null && new RegExp(pattern).hasMatch(vc)) {
         // if token isn't optional the value char must match the token pattern
         formatted = concatChar(formatted, vc, this.options, token);
         valuePos = valuePos + steps.inc;
       } else if (vc == null &&
-          token.default_ != null &&
-          this.options.usedefaults) {
+          tokenDefault != null &&
+          this.options?.usedefaults == true) {
+        
         // if the token isn't optional and has a default value, use it if the value is finished
-        formatted = concatChar(formatted, token.default_, this.options, token);
+        formatted = concatChar(formatted, tokenDefault, this.options, token);
       } else {
         // the string value don't match the given pattern
         valid = false;
