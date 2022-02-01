@@ -1,6 +1,6 @@
 name: string_mask
 description: A string formatter and validator based on masks.
-version: 0.2.0
+version: 1.0.0
 homepage: https://www.olimou.com
 author: EmersonMoura <olimou@gmail.com>
 
