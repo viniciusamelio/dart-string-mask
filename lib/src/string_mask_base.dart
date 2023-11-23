@@ -3,6 +3,8 @@
 
 import 'package:string_mask/src/mask_pattern.dart';
 
+export "./mask_pattern.dart";
+
 class StringMask {
   String pattern;
   MaskOptions? options;
